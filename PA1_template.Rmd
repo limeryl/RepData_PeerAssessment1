@@ -8,11 +8,17 @@ output: html_document
 ### Initialization
 
 Loading required libraries
-```{r,echo=TRUE}
-options(scipen=1, digits=2)
+```{r,echo=TRUE, warning=FALSE}
 library(ggplot2)
 library(data.table)
+library(knitr)
+```
 
+
+Settings
+```{r,echo=TRUE}
+options(scipen=1, digits=2)
+opts_chunk$set(echo = TRUE)
 ```  
 
 ### Loading and preprocessing the data
@@ -27,7 +33,6 @@ str(df)
 #### 2.Process/transform the data (if necessary) into a format suitable for your analysis
 ```{r,echo=TRUE}
 df$date <- as.Date(df$date, format = "%Y-%m-%d")
-# df$interval <- as.factor(df$interval)         # not sure
 head(df,3)
 str(df)
 ```
@@ -44,7 +49,7 @@ head(Total_Steps_per_day, 3)
 
 ```{r,echo=TRUE}
 ggplot(data=Total_Steps_per_day, aes(x = steps)) + 
-  geom_histogram(aes( fill=..count..)) + 
+  geom_histogram(binwidth = 820, aes( fill=..count..)) + 
         labs(title="Histogram of the total number of steps taken each day", 
              x = "Number of Steps per Day", y = "Number of times per day") 
 
@@ -69,7 +74,9 @@ steps_per_interval <- aggregate(x=list(mean_Steps=df$steps), by=list(interval=df
 ggplot(data=steps_per_interval, aes(x=interval, y=mean_Steps)) +
     geom_line() +
     xlab("5-minute interval") +
-    ylab("Average number of steps taken") 
+    ylab("Average number of steps taken") + 
+    ggtitle("time series plot number of steps taken, averaged across all days")
+
 ```
 
 
@@ -105,7 +112,7 @@ for (i in 1:nrow(new_df)) {
 new_Total_Steps_per_day <- aggregate(steps ~ date, new_df, sum)
 
 ggplot(data=new_Total_Steps_per_day, aes(x = steps)) + 
-  geom_histogram(aes( fill=..count..)) + 
+  geom_histogram(binwidth = 820, aes( fill=..count..)) + 
         labs(title="Histogram of the total number of steps taken each day", 
              x = "Number of Steps per Day", y = "Number of times per day") 
 
@@ -131,7 +138,10 @@ ggplot(new_steps_per_interval, aes(interval, steps)) +
     geom_line() + 
     facet_grid(weekday_type ~ .) +
     xlab("5-minute interval") + 
-    ylab("Average number of steps taken")
+    ylab("Average number of steps taken") + 
+    ggtitle("Time series plot Panel Week Days vs Weekend Days")
 ```
-
+  
+Week days activity is more important. Moreover, two peaks appear in around midday and afterwork periods.  
+We notice that the weekend activity is more homogeneous.
 

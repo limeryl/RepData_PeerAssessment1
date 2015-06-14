@@ -10,9 +10,17 @@ output: html_document
 Loading required libraries
 
 ```r
-options(scipen=1, digits=2)
 library(ggplot2)
 library(data.table)
+library(knitr)
+```
+
+
+Settings
+
+```r
+options(scipen=1, digits=2)
+opts_chunk$set(echo = TRUE)
 ```
 
 ### Loading and preprocessing the data
@@ -36,7 +44,6 @@ str(df)
 
 ```r
 df$date <- as.Date(df$date, format = "%Y-%m-%d")
-# df$interval <- as.factor(df$interval)         # not sure
 head(df,3)
 ```
 
@@ -79,16 +86,12 @@ head(Total_Steps_per_day, 3)
 
 ```r
 ggplot(data=Total_Steps_per_day, aes(x = steps)) + 
-  geom_histogram(aes( fill=..count..)) + 
+  geom_histogram(binwidth = 820, aes( fill=..count..)) + 
         labs(title="Histogram of the total number of steps taken each day", 
              x = "Number of Steps per Day", y = "Number of times per day") 
 ```
 
-```
-## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
-```
-
-![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png) 
+![plot of chunk unnamed-chunk-6](figure/unnamed-chunk-6-1.png) 
 
 
 
@@ -111,10 +114,11 @@ steps_per_interval <- aggregate(x=list(mean_Steps=df$steps), by=list(interval=df
 ggplot(data=steps_per_interval, aes(x=interval, y=mean_Steps)) +
     geom_line() +
     xlab("5-minute interval") +
-    ylab("Average number of steps taken") 
+    ylab("Average number of steps taken") + 
+    ggtitle("time series plot number of steps taken, averaged across all days")
 ```
 
-![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png) 
+![plot of chunk unnamed-chunk-8](figure/unnamed-chunk-8-1.png) 
 
 
 #### 2.Which 5-minute interval, on average across all the days in the dataset, contains the maximum number of steps?
@@ -153,16 +157,12 @@ for (i in 1:nrow(new_df)) {
 new_Total_Steps_per_day <- aggregate(steps ~ date, new_df, sum)
 
 ggplot(data=new_Total_Steps_per_day, aes(x = steps)) + 
-  geom_histogram(aes( fill=..count..)) + 
+  geom_histogram(binwidth = 820, aes( fill=..count..)) + 
         labs(title="Histogram of the total number of steps taken each day", 
              x = "Number of Steps per Day", y = "Number of times per day") 
 ```
 
-```
-## stat_bin: binwidth defaulted to range/30. Use 'binwidth = x' to adjust this.
-```
-
-![plot of chunk unnamed-chunk-11](figure/unnamed-chunk-11-1.png) 
+![plot of chunk unnamed-chunk-12](figure/unnamed-chunk-12-1.png) 
 
 ```r
 new_mean_Steps_per_day   <- mean(new_Total_Steps_per_day$steps, na.rm=TRUE)
@@ -188,9 +188,12 @@ ggplot(new_steps_per_interval, aes(interval, steps)) +
     geom_line() + 
     facet_grid(weekday_type ~ .) +
     xlab("5-minute interval") + 
-    ylab("Average number of steps taken")
+    ylab("Average number of steps taken") + 
+    ggtitle("Time series plot Panel Week Days vs Weekend Days")
 ```
 
-![plot of chunk unnamed-chunk-13](figure/unnamed-chunk-13-1.png) 
-
+![plot of chunk unnamed-chunk-14](figure/unnamed-chunk-14-1.png) 
+  
+Week days activity is more important. Moreover, two peaks appear in around midday and afterwork periods.  
+We notice that the weekend activity is more homogeneous.
 
